@@ -104,3 +104,58 @@ def recent_readings(records, count=5):
             }
         )
     return list(recent_queue)
+
+# Combine metadata and all analytical aggregations into one summary dictionary.
+def build_summary(records):
+# Combines the aggregations into one dict and ready to write the summary to a JSON file. 
+    daily_stats = aggregate_by_date(records)
+
+    # Find the day with the highest maximum temperature
+    hottest_day = max(
+        daily_stats, key=lambda d: daily_stats[d]["max_temp_c"]
+    )
+
+    return {
+        "source_url": SOURCE_URL,
+        "records_processed": len(records),
+        "hottest_day": hottest_day,
+        "hottest_day_max_temp_c": daily_stats[hottest_day]["max_temp_c"],
+        "daily_breakdown": daily_stats,
+        "condition_counts": classify_weather_conditions(records),
+        "recent_readings": recent_readings(records, count=5),
+    }
+
+
+def write_summary(summary, path):
+    # Write the summary dictionary to a JSON file with encoding and formatting
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(summary, f, indent=2)
+
+# Downloading data, performing aggregations, and saving the JSON summary.
+def main():
+    try:
+        # Fetch data using requests with timeout and raise_for_status
+        records = fetch_records(SOURCE_URL)
+    except requests.RequestException as err:
+        # Exit with a clean error message
+        sys.exit(f"Error: Download failed from source API. {err}")
+
+    if not records:
+        sys.exit("Error: No valid records retrieved.")
+
+    summary = build_summary(records)
+    
+    # saving the JSON summary
+    write_summary(summary, OUTPUT)
+
+    # Clean execution feedback as the example
+    print(f"Read {len(records)} weather records from source API.")
+    print(
+        f"Hottest day was {summary['hottest_day']} with a high of "
+        f"{summary['hottest_day_max_temp_c']}°C."
+    )
+    print(f"Summary written to {OUTPUT}")
+
+
+if __name__ == "__main__":
+    main()
