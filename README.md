@@ -1,9 +1,9 @@
 
-# Project Name
-One or two sentences on what this program summarizes, and why that is useful.
+# Weather App Builder
+This program downloads a week of hourly temperature and rain data for Toronto from an open API and summarizes it into daily stats and weather patterns. It's useful because looking through hundreds of raw weather numbers is annoying, so this automatically breaks down the highs, lows, averages, and rainfall for you.
 
 ## Data source
-The URL, what one record represents, and roughly how many records it returns.
+The data comes from the [Open-Meteo Weather API](https://api.open-meteo.com/v1/forecast?latitude=43.65&longitude=-79.38&hourly=temperature_2m,precipitation&past_days=7&forecast_days=0&timezone=America/Toronto). One record represents one hour of weather data (containing a timestamp, temperature in °C, and precipitation in mm), and the API returns around 168 records for a full 7-day period.
 
 ## Setup
 python -m venv .venv

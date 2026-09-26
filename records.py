@@ -49,3 +49,28 @@ def fetch_records(url):
             continue
 
     return records
+
+
+# Aggregate by date groups using a dictionary and computes statistics on classes of weather conditions alognside categories.
+def aggregate_by_date(records):
+    
+    #Group weather records by date using a dictionary
+    grouped = defaultdict(list)
+    for rec in records:
+        date_str = rec.timestamp.split("T")[0]
+        grouped[date_str].append(rec)
+
+    # building a dictionary of aggregations per date and returns min, max, and average temperature along with total precipitation per date.
+    return {
+        date: {
+            "min_temp_c": round(min(r.temperature for r in day_recs), 1),
+            "max_temp_c": round(max(r.temperature for r in day_recs), 1),
+            "avg_temp_c": round(
+                sum(r.temperature for r in day_recs) / len(day_recs), 1
+            ),
+            "total_precip_mm": round(sum(r.precipitation for r in day_recs), 1),
+            "readings": len(day_recs),
+        }
+        for date, day_recs in grouped.items()
+    }
+
