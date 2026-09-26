@@ -74,3 +74,33 @@ def aggregate_by_date(records):
         for date, day_recs in grouped.items()
     }
 
+# Classify hourly readings into condition categories and count their frequencies using a collection
+def classify_weather_conditions(records):
+    # frequency of weather condition classifications.
+    conditions = []
+    for rec in records:
+        if rec.precipitation > 0.0:
+            conditions.append("Precipitation")
+        elif rec.temperature < 0.0:
+            conditions.append("Freezing Dry")
+        elif rec.temperature < 15.0:
+            conditions.append("Cool Dry")
+        else:
+            conditions.append("Warm Dry")
+
+    # Frequencies on classifications of weather conditions 
+    return dict(Counter(conditions))
+
+# Retrieve the last hourly records using a fixed-size to show recent trends.
+def recent_readings(records, count=5):
+     # deque with maxlen to maintain a the recent records
+    recent_queue = deque(maxlen=count)
+    for rec in records:
+        recent_queue.append(
+            {
+                "timestamp": rec.timestamp,
+                "temperature_c": rec.temperature,
+                "precipitation_mm": rec.precipitation,
+            }
+        )
+    return list(recent_queue)
